@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">ThinkFastGame</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="normalButton">Normal</string>
+    <string name="fastButton">Fast</string>
+    <string name="titleTextView">Think Fast!</string>
+    <string name="title_activity_think_fast">ThinkFast</string>
+</resources>
