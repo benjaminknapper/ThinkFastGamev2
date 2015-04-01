@@ -18,11 +18,9 @@ public class ThinkFast extends ActionBarActivity {
 
     private int score = 0;
     private Random rand = new Random();
-    private int textRand;
-    private int iconRand;
-    private int textState;
     private TextView commandText;
     private ImageView commandImage;
+    TFState currentState;
 
 
 
@@ -37,8 +35,12 @@ public class ThinkFast extends ActionBarActivity {
         commandImage.setOnClickListener(commandImageClickHandler);
         commandImage.setOnTouchListener(commandImageTouchHandler);
 
-        runGame();
+        currentState = new TFState(rand);
+        updateStateDisplayed();
+
     }
+
+
 
 
     @Override
@@ -56,6 +58,7 @@ public class ThinkFast extends ActionBarActivity {
 
         }
     };
+
 //commandImage swipe listener
     View.OnTouchListener commandImageTouchHandler = new View.OnTouchListener() {
 
@@ -84,26 +87,45 @@ public class ThinkFast extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void runGame() {
-        setTextAndIcon();
+    public void updateStateDisplayed() {
+        if(currentState.isOpposite()) {
+            commandText.setTextColor(Color.RED);
+        } else {
+            commandText.setTextColor(Color.GREEN);
+        }
 
-    }
+        if(currentState.getAction() == TFState.ACTION_TOUCH) {
+            commandImage.setImageResource(R.drawable.colored_bullseye);
+            commandText.setText("Touch It");
+        } else if(currentState.getAction() == TFState.ACTION_SWIPE) {
+            commandImage.setImageResource(R.drawable.swipe_arrow);
+            commandText.setText("Swipe It");
+        }
 
-    public void setTextAndIcon() {
-        textRand = rand.nextInt(2);
-        iconRand = rand.nextInt(2);
+
+
+
+     /*   textRand = rand.nextInt(2);
+        imageRand = rand.nextInt(2);
+    //Green = 0, Red = 1
+        textColorState = textRand;
+        imageState = ACTIN_TOUCH;
         if(textRand == 0) {
             commandText.setTextColor(Color.GREEN);
         } else if(textRand == 1) {
             commandText.setTextColor(Color.RED);
         }
-
-        if(iconRand == 0) {
+    //Touch It = 0, Swipe It = 1
+        if(imageRand == 0) {
             commandImage.setImageResource(R.drawable.colored_bullseye);
             commandText.setText("Touch It");
-        } else if(iconRand == 1) {
+        } else if(imageRand == 1) {
             commandImage.setImageResource(R.drawable.swipe_arrow);
             commandText.setText("Swipe It");
-        }
+        } */
+    }
+
+    public void endGame() {
+
     }
 }
