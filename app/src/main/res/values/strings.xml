@@ -7,4 +7,5 @@
     <string name="fastButton">Fast</string>
     <string name="titleTextView">Think Fast!</string>
     <string name="title_activity_think_fast">ThinkFast</string>
+    <string name="scoreTextView" />
 </resources>

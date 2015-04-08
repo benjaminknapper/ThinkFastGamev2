@@ -1,6 +1,7 @@
 package edu.augustana.csc490.thinkfastgame;
 
 import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,21 +12,27 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import java.lang.Math;
-import android.widget.Toast;
 
 import java.util.Random;
 
 
 public class ThinkFast extends ActionBarActivity {
 
+    private String TAG = "THINK_FAST";
     private int score = 0;
     private Random rand = new Random();
     private TextView commandText;
     private ImageView commandImage;
+    private TextView scoreTextView;
+    private TextView timeRemainingTextView;
 //for use in the MotionEvent handler
     int startX;
     int startY;
+    int time = 5000;
+    CountDownTimer timer;
     TFState currentState;
+    TFState candidateState;
+
 
 
 
@@ -36,12 +43,14 @@ public class ThinkFast extends ActionBarActivity {
 
         commandText = (TextView) findViewById(R.id.commandText);
         commandImage = (ImageView) findViewById(R.id.commandImage);
+        scoreTextView = (TextView) findViewById(R.id.scoreTextView);
+        timeRemainingTextView = (TextView) findViewById(R.id.timeRemainingTextView);
 
         commandImage.setOnClickListener(commandImageClickHandler);
         commandImage.setOnTouchListener(commandImageTouchHandler);
 
-        currentState = new TFState(rand);
-        updateStateDisplayed();
+        nextState();
+
 
     }
 
@@ -64,14 +73,36 @@ public class ThinkFast extends ActionBarActivity {
         }
     };
 
+    private void nextState() {
+        candidateState = new TFState(rand);
+        while(candidateState.equals(currentState)) {
+            candidateState = new TFState(rand);
+        }
+        currentState = candidateState;
+        timer = new CountDownTimer(time, 100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String seconds = "" + (int) millisUntilFinished / 1000;
+                String ms = "" + millisUntilFinished / 100;
+                if(ms.length() > 1) {
+                    ms = ms.substring(1);
+                }
+                timeRemainingTextView.setText("Time: " + seconds + "." + ms);
+            }
+
+            @Override
+            public void onFinish() {
+                Log.w(TAG,"Time Out" );
+                endGame();
+            }
+        }.start();
+        updateStateDisplayed();
+    }
 //commandImage swipe listener
     View.OnTouchListener commandImageTouchHandler = new View.OnTouchListener() {
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            boolean correctAction = false;
-            int endX;
-            int endY;
 
             int actionTaken = event.getAction();
 
@@ -81,27 +112,29 @@ public class ThinkFast extends ActionBarActivity {
                 startX = (int) event.getX();
                 startY = (int) event.getY();
             }
+            else if(actionTaken == MotionEvent.ACTION_UP) {
+                boolean correctAction = false;
+                int endX = (int) event.getX();
+                int endY = (int) event.getY();
 
-            if(actionTaken == MotionEvent.ACTION_UP) {
-                endX = (int) event.getX();
-                endY = (int) event.getY();
-
-                if((Math.abs(startX - endX) <= 7) && ((Math.abs(startY - endY)) <= 7)) {
+                if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
                     correctAction = currentState.isCorrectMove(TFState.ACTION_TOUCH);
-                    Log.w("Sent info to TFState","TOUCH Action");
-                } else if((Math.abs(startX - endX) > 7) && ((Math.abs(startY - endY)) > 7)) {
+                    Log.w(TAG,"TOUCH Action");
+                } else { // user moved more than 20 units in X or Y dimension
                     correctAction = currentState.isCorrectMove(TFState.ACTION_SWIPE);
-                    Log.w("Sent info to TFState","SWIPE + startX = " + startX + " endX " + endX);
+                    Log.w(TAG,"SWIPE + startX = " + startX + " endX " + endX);
                 }
 
                 if (correctAction) {
                     score++;
-                    currentState = new TFState(rand);
-                    updateStateDisplayed();
+                    time = time - time/20;
+                    timer.cancel();
+                    nextState();
+
                 } else {
+                    Log.w(TAG, "Incorrect Move");
                     endGame();
                 }
-
             }
 
          //   if(actionTaken == MotionEvent.ACTION_UP) {
@@ -116,6 +149,7 @@ public class ThinkFast extends ActionBarActivity {
 
 
     };
+
 
 
     @Override
@@ -147,6 +181,9 @@ public class ThinkFast extends ActionBarActivity {
             commandImage.setImageResource(R.drawable.swipe_arrow);
             commandText.setText("Swipe It");
         }
+
+        scoreTextView.setText("Score: " + score);
+
 
 
 
