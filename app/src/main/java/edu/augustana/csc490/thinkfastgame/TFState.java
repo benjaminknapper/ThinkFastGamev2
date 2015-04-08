@@ -6,10 +6,11 @@ import java.util.Random;
  * Created by Benjamin on 4/1/2015.
  */
 public class TFState {
-    public static final int NUM_ACTIONS = 2;
+    public static final int NUM_ACTIONS = 3;
 
     public static final int ACTION_TOUCH = 0; // action constants must be declared sequentially from zero
     public static final int ACTION_SWIPE = 1;
+    public static final int ACTION_SHAKE = 2;
 
     private boolean opposite;
     private int targetAction;

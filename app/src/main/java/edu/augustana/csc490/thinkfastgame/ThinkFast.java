@@ -1,6 +1,9 @@
 package edu.augustana.csc490.thinkfastgame;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.CountDownTimer;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,10 +19,15 @@ import java.lang.Math;
 import java.util.Random;
 
 
-public class ThinkFast extends ActionBarActivity {
+public class ThinkFast extends ActionBarActivity implements ShakeListener {
+
+    private SensorManager mySensorManager;
+    private Sensor myAccelerometer;
+
 
     private String TAG = "THINK_FAST";
     private int score = 0;
+    private int state;
     private Random rand = new Random();
     private TextView commandText;
     private ImageView commandImage;
@@ -32,6 +40,8 @@ public class ThinkFast extends ActionBarActivity {
     CountDownTimer timer;
     TFState currentState;
     TFState candidateState;
+    ShakeSensorListener myShakeSensorListener;
+
 
 
 
@@ -46,16 +56,19 @@ public class ThinkFast extends ActionBarActivity {
         scoreTextView = (TextView) findViewById(R.id.scoreTextView);
         timeRemainingTextView = (TextView) findViewById(R.id.timeRemainingTextView);
 
+//taken/edited from
+// http://code.tutsplus.com/tutorials/using-the-accelerometer-on-android--mobile-22125
+        mySensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        myAccelerometer = mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        myShakeSensorListener = new ShakeSensorListener(this);
+        mySensorManager.registerListener(myShakeSensorListener, myAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
+
         commandImage.setOnClickListener(commandImageClickHandler);
         commandImage.setOnTouchListener(commandImageTouchHandler);
 
         nextState();
-
-
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -64,6 +77,23 @@ public class ThinkFast extends ActionBarActivity {
 
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 //commandImage click listener
     View.OnClickListener commandImageClickHandler = new View.OnClickListener() {
 
@@ -80,8 +110,10 @@ public class ThinkFast extends ActionBarActivity {
         }
         currentState = candidateState;
         timer = new CountDownTimer(time, 100) {
+
             @Override
             public void onTick(long millisUntilFinished) {
+        //Display time code from Trevor Warner
                 String seconds = "" + (int) millisUntilFinished / 1000;
                 String ms = "" + millisUntilFinished / 100;
                 if(ms.length() > 1) {
@@ -113,58 +145,55 @@ public class ThinkFast extends ActionBarActivity {
                 startY = (int) event.getY();
             }
             else if(actionTaken == MotionEvent.ACTION_UP) {
-                boolean correctAction = false;
+             //   boolean correctAction = false;
                 int endX = (int) event.getX();
                 int endY = (int) event.getY();
 
-                if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
-                    correctAction = currentState.isCorrectMove(TFState.ACTION_TOUCH);
-                    Log.w(TAG,"TOUCH Action");
-                } else { // user moved more than 20 units in X or Y dimension
-                    correctAction = currentState.isCorrectMove(TFState.ACTION_SWIPE);
-                    Log.w(TAG,"SWIPE + startX = " + startX + " endX " + endX);
-                }
-
-                if (correctAction) {
-                    score++;
-                    time = time - time/20;
-                    timer.cancel();
-                    nextState();
-
-                } else {
-                    Log.w(TAG, "Incorrect Move");
-                    endGame();
-                }
+            if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
+            state = TFState.ACTION_TOUCH;
+            } else {
+            state = TFState.ACTION_SWIPE;
             }
 
-         //   if(actionTaken == MotionEvent.ACTION_UP) {
-         //       correctAction = currentState.isCorrectMove(actionTaken);
-         //  } else if(actionTaken == MotionEvent.ACTION_MOVE) {
-         //       correctAction = currentState.isCorrectMove(actionTaken);
-         //   } else {
-         //       correctAction = false;
-         //   }
+            updateGame(state);
+
+
+
+             //   if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
+             //       correctAction = currentState.isCorrectMove(TFState.ACTION_TOUCH);
+             //      Log.w(TAG,"TOUCH Action");
+             //   } else { // user moved more than 20 units in X or Y dimension
+             //       correctAction = currentState.isCorrectMove(TFState.ACTION_SWIPE);
+             //       Log.w(TAG,"SWIPE + startX = " + startX + " endX " + endX);
+             //   }
+
+             //   if (correctAction) {
+             //       score++;
+             //       time = time - time/20;
+             //       timer.cancel();
+             //       nextState();
+             //
+             //   } else {
+             //       Log.w(TAG, "Incorrect Move");
+             //      endGame();
+             //   }
+            }
             return false;
         }
 
 
     };
 
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void updateGame(int actionTaken) {
+        if(currentState.isCorrectMove(actionTaken)) {
+            score++;
+            time = time - time/20;
+            timer.cancel();
+            nextState();
+        } else {
+            Log.w(TAG, "Incorrect Move");
+            endGame();
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void updateStateDisplayed() {
@@ -180,35 +209,37 @@ public class ThinkFast extends ActionBarActivity {
         } else if(currentState.getAction() == TFState.ACTION_SWIPE) {
             commandImage.setImageResource(R.drawable.swipe_arrow);
             commandText.setText("Swipe It");
+        } else if(currentState.getAction() == TFState.ACTION_SHAKE) {
+            commandImage.setImageResource(android.R.drawable.ic_menu_always_landscape_portrait);
+            commandText.setText("Shake It");
         }
 
         scoreTextView.setText("Score: " + score);
 
-
-
-
-
-     /*   textRand = rand.nextInt(2);
-        imageRand = rand.nextInt(2);
-    //Green = 0, Red = 1
-        textColorState = textRand;
-        imageState = ACTION_TOUCH;
-        if(textRand == 0) {
-            commandText.setTextColor(Color.GREEN);
-        } else if(textRand == 1) {
-            commandText.setTextColor(Color.RED);
-        }
-    //Touch It = 0, Swipe It = 1
-        if(imageRand == 0) {
-            commandImage.setImageResource(R.drawable.colored_bullseye);
-            commandText.setText("Touch It");
-        } else if(imageRand == 1) {
-            commandImage.setImageResource(R.drawable.swipe_arrow);
-            commandText.setText("Swipe It");
-        } */
     }
 
     public void endGame() {
+        mySensorManager.unregisterListener(myShakeSensorListener);
         finish();
+    }
+
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mySensorManager.unregisterListener(myShakeSensorListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mySensorManager.registerListener(myShakeSensorListener, myAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onShakeEvent() {
+        updateGame(TFState.ACTION_SHAKE);
+        Log.w(TAG,"Shake Occurred");
     }
 }
