@@ -1,6 +1,7 @@
 package edu.augustana.csc490.thinkfastgame;
 
 import android.graphics.Color;
+import android.view.MotionEvent;
 
 import java.util.Random;
 
@@ -15,6 +16,7 @@ public class TFState {
 
     private boolean opposite;
     private int targetAction;
+    private int targetActionID;
 
     public TFState(Random rand) {
         int imageState = rand.nextInt(2);
@@ -22,8 +24,10 @@ public class TFState {
 
         if(imageState == ACTION_TOUCH) {
             targetAction = ACTION_TOUCH;
+            //targetActionID = MotionEvent.ACTION_DOWN;
         } else if(imageState == ACTION_SWIPE) {
             targetAction = ACTION_SWIPE;
+            //targetActionID = MotionEvent.ACTION_MOVE;
         }
 
         if(textState == COLOR_GREEN) {
@@ -42,6 +46,19 @@ public class TFState {
     }
 
     public boolean isCorrectMove(int userAction) {
-        return true;
+        if(userAction == this.targetAction) {
+            if(!opposite) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            if(!opposite) {
+                return false;
+            } else {
+                return true;
+            }
+
+        }
     }
 }
