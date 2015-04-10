@@ -8,7 +8,7 @@
     <Button
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="@string/normalButton"
+        android:text="@string/playGame"
         android:id="@+id/normalButton"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
@@ -16,7 +16,7 @@
     <Button
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="@string/fastButton"
+        android:text="@string/howToButton"
         android:id="@+id/fastButton"
         android:layout_below="@+id/normalButton"
         android:layout_centerHorizontal="true" />

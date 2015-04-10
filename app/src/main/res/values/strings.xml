@@ -3,9 +3,14 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="normalButton">Normal</string>
-    <string name="fastButton">Fast</string>
+    <string name="playGame">Play Game</string>
+    <string name="howToButton">How To Play</string>
     <string name="titleTextView">Think Fast!</string>
     <string name="title_activity_think_fast">ThinkFast</string>
+    <string name="end_game_prompt">Game Over</string>
+    <string name="reset_button">Restart</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="play_button">Play</string>
+    <string name="main_menu_button">Main Menu</string>
     <string name="scoreTextView" />
 </resources>

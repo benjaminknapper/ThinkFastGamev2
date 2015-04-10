@@ -1,6 +1,9 @@
 package edu.augustana.csc490.thinkfastgame;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -192,6 +195,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
             nextState();
         } else {
             Log.w(TAG, "Incorrect Move");
+            timer.cancel();
             endGame();
         }
     }
@@ -218,9 +222,28 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
 
     }
 
+
     public void endGame() {
         mySensorManager.unregisterListener(myShakeSensorListener);
-        finish();
+
+        //code from http://stackoverflow.com/questions/2115758/how-to-display-alert-dialog-in-android
+        Log.w(TAG,"Start Dialog");
+        new AlertDialog.Builder(this)
+                .setTitle("Game Over")
+                .setMessage("Score: " + score)
+                .setPositiveButton(R.string.reset_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        Log.w(TAG,"End Dialog");
     }
 
 
@@ -229,12 +252,14 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     protected void onPause() {
         super.onPause();
         mySensorManager.unregisterListener(myShakeSensorListener);
+        timer.cancel();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mySensorManager.registerListener(myShakeSensorListener, myAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        timer.start();
     }
 
     @Override
