@@ -38,7 +38,7 @@ public class ShakeSensorListener implements SensorEventListener {
                 long diffTime = (curTime - lastUpdate);
                 lastUpdate = curTime;
 
-                float speed = Math.abs(x + y + z - last_x - last_y - last_z)/ diffTime * 10000;
+                float speed = Math.abs(x + y + z - last_x - last_y - last_z) / diffTime * 10000;
 
                 if (speed > SHAKE_THRESHOLD && (System.currentTimeMillis() - lastShake) > 500) {
                     lastShake = System.currentTimeMillis();
@@ -50,10 +50,6 @@ public class ShakeSensorListener implements SensorEventListener {
                 last_z = z;
             }
         }
-
-
-        //if shake event happened
-        // myListener.onShakeEvent();
     }
 
     @Override

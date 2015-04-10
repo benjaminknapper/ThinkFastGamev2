@@ -28,42 +28,42 @@ public class MainMenu extends ActionBarActivity {
         howToButton.setOnClickListener(howToButtonClickHandler);
     }
 
-        View.OnClickListener normalButtonClickHandler = new View.OnClickListener() {
+    View.OnClickListener normalButtonClickHandler = new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                Intent activateGame = new Intent(MainMenu.this, ThinkFast.class);
-                startActivity(activateGame);
-            }
-        };
+        @Override
+        public void onClick(View v) {
+            Intent activateGame = new Intent(MainMenu.this, ThinkFast.class);
+            startActivity(activateGame);
+        }
+    };
 
-        View.OnClickListener howToButtonClickHandler = new View.OnClickListener() {
+    View.OnClickListener howToButtonClickHandler = new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                Log.w(TAG, "Reached onClick");
-                new AlertDialog.Builder(MainMenu.this)
-                        .setTitle("Game Instructions")
-                        .setMessage("An image and some text will appear on the screen. " +
-                                "There are 3 commands: Touch It, Swipe It, and Shake It. " +
-                                "If the text above the image is red you must do one of the two actions. " +
-                                "For example if the \"Touch It\" text is red you must either Swipe or Shake the device. " +
-                                "If the text is green follow the command shown.")
-                        .setPositiveButton(R.string.play_button, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Intent activateGame = new Intent(MainMenu.this, ThinkFast.class);
-                                startActivity(activateGame);
-                            }
-                        })
-                        .setNegativeButton(R.string.main_menu_button, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+        @Override
+        public void onClick(View v) {
+            Log.w(TAG, "Reached onClick");
+            new AlertDialog.Builder(MainMenu.this)
+                    .setTitle("Game Instructions")
+                    .setMessage("An image and some text will appear on the screen. " +
+                            "There are 3 commands: Touch It, Swipe It, and Shake It. " +
+                            "If the text above the image is red you must do one of the two actions. " +
+                            "For example if the \"Touch It\" text is red you must either Swipe or Shake the device. " +
+                            "If the text is green follow the command shown.")
+                    .setPositiveButton(R.string.play_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent activateGame = new Intent(MainMenu.this, ThinkFast.class);
+                            startActivity(activateGame);
+                        }
+                    })
+                    .setNegativeButton(R.string.main_menu_button, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
 
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        };
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+        }
+    };
 
 
     @Override

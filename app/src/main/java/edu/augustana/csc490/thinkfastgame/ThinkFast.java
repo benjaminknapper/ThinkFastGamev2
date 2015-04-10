@@ -3,7 +3,6 @@ package edu.augustana.csc490.thinkfastgame;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
@@ -17,6 +16,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import java.lang.Math;
 
 import java.util.Random;
@@ -36,7 +36,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     private ImageView commandImage;
     private TextView scoreTextView;
     private TextView timeRemainingTextView;
-//for use in the MotionEvent handler
+    //for use in the MotionEvent handler
     int startX;
     int startY;
     int time = 5000;
@@ -44,9 +44,6 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     TFState currentState;
     TFState candidateState;
     ShakeSensorListener myShakeSensorListener;
-
-
-
 
 
     @Override
@@ -65,7 +62,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
         myAccelerometer = mySensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         myShakeSensorListener = new ShakeSensorListener(this);
-        mySensorManager.registerListener(myShakeSensorListener, myAccelerometer , SensorManager.SENSOR_DELAY_NORMAL);
+        mySensorManager.registerListener(myShakeSensorListener, myAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
         commandImage.setOnClickListener(commandImageClickHandler);
         commandImage.setOnTouchListener(commandImageTouchHandler);
@@ -97,7 +94,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     }
 
 
-//commandImage click listener
+    //commandImage click listener
     View.OnClickListener commandImageClickHandler = new View.OnClickListener() {
 
         @Override
@@ -108,7 +105,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
 
     private void nextState() {
         candidateState = new TFState(rand);
-        while(candidateState.equals(currentState)) {
+        while (candidateState.equals(currentState)) {
             candidateState = new TFState(rand);
         }
         currentState = candidateState;
@@ -116,10 +113,10 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
 
             @Override
             public void onTick(long millisUntilFinished) {
-        //Display time code from Trevor Warner
+                //Display time code from Trevor Warner
                 String seconds = "" + (int) millisUntilFinished / 1000;
                 String ms = "" + millisUntilFinished / 100;
-                if(ms.length() > 1) {
+                if (ms.length() > 1) {
                     ms = ms.substring(1);
                 }
                 timeRemainingTextView.setText("Time: " + seconds + "." + ms);
@@ -127,13 +124,14 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
 
             @Override
             public void onFinish() {
-                Log.w(TAG,"Time Out" );
+                Log.w(TAG, "Time Out");
                 endGame();
             }
         }.start();
         updateStateDisplayed();
     }
-//commandImage swipe listener
+
+    //commandImage swipe listener
     View.OnTouchListener commandImageTouchHandler = new View.OnTouchListener() {
 
         @Override
@@ -141,45 +139,23 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
 
             int actionTaken = event.getAction();
 
-           // Log.w("THINK_FAST", "actionTaken=" + actionTaken);
 
             if (actionTaken == MotionEvent.ACTION_DOWN) {
                 startX = (int) event.getX();
                 startY = (int) event.getY();
-            }
-            else if(actionTaken == MotionEvent.ACTION_UP) {
-             //   boolean correctAction = false;
+            } else if (actionTaken == MotionEvent.ACTION_UP) {
+
                 int endX = (int) event.getX();
                 int endY = (int) event.getY();
 
-            if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
-            state = TFState.ACTION_TOUCH;
-            } else {
-            state = TFState.ACTION_SWIPE;
-            }
+                if ((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
+                    state = TFState.ACTION_TOUCH;
+                } else {
+                    state = TFState.ACTION_SWIPE;
+                }
 
-            updateGame(state);
+                updateGame(state);
 
-
-
-             //   if((Math.abs(startX - endX) <= 20) && ((Math.abs(startY - endY)) <= 20)) {
-             //       correctAction = currentState.isCorrectMove(TFState.ACTION_TOUCH);
-             //      Log.w(TAG,"TOUCH Action");
-             //   } else { // user moved more than 20 units in X or Y dimension
-             //       correctAction = currentState.isCorrectMove(TFState.ACTION_SWIPE);
-             //       Log.w(TAG,"SWIPE + startX = " + startX + " endX " + endX);
-             //   }
-
-             //   if (correctAction) {
-             //       score++;
-             //       time = time - time/20;
-             //       timer.cancel();
-             //       nextState();
-             //
-             //   } else {
-             //       Log.w(TAG, "Incorrect Move");
-             //      endGame();
-             //   }
             }
             return false;
         }
@@ -188,9 +164,9 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     };
 
     public void updateGame(int actionTaken) {
-        if(currentState.isCorrectMove(actionTaken)) {
+        if (currentState.isCorrectMove(actionTaken)) {
             score++;
-            time = time - time/20;
+            time = time - time / 20;
             timer.cancel();
             nextState();
         } else {
@@ -201,19 +177,19 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     }
 
     public void updateStateDisplayed() {
-        if(currentState.isOpposite()) {
+        if (currentState.isOpposite()) {
             commandText.setTextColor(Color.RED);
         } else {
             commandText.setTextColor(Color.GREEN);
         }
 
-        if(currentState.getAction() == TFState.ACTION_TOUCH) {
+        if (currentState.getAction() == TFState.ACTION_TOUCH) {
             commandImage.setImageResource(R.drawable.colored_bullseye);
             commandText.setText("Touch It");
-        } else if(currentState.getAction() == TFState.ACTION_SWIPE) {
+        } else if (currentState.getAction() == TFState.ACTION_SWIPE) {
             commandImage.setImageResource(R.drawable.swipe_arrow);
             commandText.setText("Swipe It");
-        } else if(currentState.getAction() == TFState.ACTION_SHAKE) {
+        } else if (currentState.getAction() == TFState.ACTION_SHAKE) {
             commandImage.setImageResource(android.R.drawable.ic_menu_always_landscape_portrait);
             commandText.setText("Shake It");
         }
@@ -227,7 +203,7 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
         mySensorManager.unregisterListener(myShakeSensorListener);
 
         //code from http://stackoverflow.com/questions/2115758/how-to-display-alert-dialog-in-android
-        Log.w(TAG,"Start Dialog");
+        Log.w(TAG, "Start Dialog");
         new AlertDialog.Builder(this)
                 .setTitle("Game Over")
                 .setMessage("Score: " + score)
@@ -243,9 +219,8 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
-        Log.w(TAG,"End Dialog");
+        Log.w(TAG, "End Dialog");
     }
-
 
 
     @Override
@@ -265,6 +240,6 @@ public class ThinkFast extends ActionBarActivity implements ShakeListener {
     @Override
     public void onShakeEvent() {
         updateGame(TFState.ACTION_SHAKE);
-        Log.w(TAG,"Shake Occurred");
+        Log.w(TAG, "Shake Occurred");
     }
 }

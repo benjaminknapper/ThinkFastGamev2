@@ -29,14 +29,14 @@ public class TFState {
     }
 
     public boolean isCorrectMove(int userAction) {
-        if(opposite){
+        if (opposite) {
             return (userAction != this.targetAction);
-        } else{
+        } else {
             return (userAction == this.targetAction);
         }
 
 
-        }
+    }
 
 
     @Override
